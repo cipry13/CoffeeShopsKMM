@@ -1,7 +1,7 @@
 import SwiftUI
 import shared
 
-class ViewModel: ObservableObject {
+@MainActor class ViewModel: ObservableObject {
     let api: ApiClass
     
     @Published var coffeeShopList: [CoffeeShop] = []
@@ -10,9 +10,11 @@ class ViewModel: ObservableObject {
         self.api = api
     }
     
-    func loadCoffeeShops(){
-        api.getData { coffeeShops in
-            self.coffeeShopList = coffeeShops
+    func loadCoffeeShops() async {
+        do {
+            self.coffeeShopList = try await api.getData()
+        } catch {
+            print(error)
         }
     }
 }
@@ -20,7 +22,7 @@ class ViewModel: ObservableObject {
 struct ContentView: View {
     @StateObject var viewModel = ViewModel(api: ApiClass())
     
-	var body: some View {
+    var body: some View {
         ForEach(self.viewModel.coffeeShopList, id: \.name) { coffeeShop in
             VStack {
                 Text("\(coffeeShop.id)")
@@ -28,7 +30,9 @@ struct ContentView: View {
                 Text(coffeeShop.x + " " + coffeeShop.y)
             }.padding(.bottom, 10)
         }.onAppear {
-            self.viewModel.loadCoffeeShops()
+            Task {
+                await self.viewModel.loadCoffeeShops()
+            }
         }
     }
 }
