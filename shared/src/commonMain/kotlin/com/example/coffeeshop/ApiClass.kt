@@ -29,7 +29,6 @@ class ApiClass {
 
     private suspend fun postToken(): TokenHolder = httpClient.post(apiUrl + postPath)
 
-
     companion object {
         private const val apiUrl = "https://blue-bottle-api-test.herokuapp.com/"
         private const val getPath = "v1/coffee_shops"
