@@ -1,46 +1,34 @@
 package com.example.coffeeshop
 
 import io.ktor.client.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
 import io.ktor.client.request.*
-import io.ktor.http.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 @ExperimentalSerializationApi
 class ApiClass {
-    private val client = HttpClient()
-
-    fun getData(success: (List<CoffeeShop>) -> Unit) {
-        GlobalScope.launch(ApplicationDispatcher) {
-            try {
-                val token = postToken()
-                val requestResult = client.get<String>(apiUrl + getPath) {
-                    headers {
-                        append(HttpHeaders.Accept, "application/json")
-                        append(HttpHeaders.Authorization, "token")
-                    }
-                    parameter("token", token)
-                }
-                val list = Json.decodeFromString<List<CoffeeShop>>(requestResult)
-
-                success(list)
-            } catch (e: Throwable) {
-                // handle network error
+    private val httpClient = HttpClient {
+        install(JsonFeature) {
+            val json = kotlinx.serialization.json.Json {
+                ignoreUnknownKeys = true
+                useAlternativeNames = false
             }
+            serializer = KotlinxSerializer(json)
         }
     }
 
-    private suspend fun postToken(): String {
-        val requestResult = client.post<String>(apiUrl + postPath) {
-            headers {
-                append(HttpHeaders.Accept, "application/json")
-            }
+    suspend fun getData(): List<CoffeeShop> {
+        val token = postToken().token
+
+        val requestResult: List<CoffeeShop> = httpClient.get(apiUrl + getPath) {
+            parameter("token", token)
         }
-        return Json.decodeFromString<TokenHolder>(requestResult).token
+        return requestResult
     }
+
+    private suspend fun postToken(): TokenHolder = httpClient.post(apiUrl + postPath)
+
 
     companion object {
         private const val apiUrl = "https://blue-bottle-api-test.herokuapp.com/"

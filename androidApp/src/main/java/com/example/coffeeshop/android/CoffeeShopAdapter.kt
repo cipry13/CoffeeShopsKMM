@@ -35,5 +35,4 @@ class CoffeeShopsAdapter(private val coffeeShops: List<CoffeeShop>) :
     }
 }
 
-fun CoffeeShop.pretify() =
-    "${this.id} ${this.name} \n${this.x} ${this.y} \n"
+fun CoffeeShop.pretify() = "${this.id} ${this.name} \n${this.x} ${this.y} \n"

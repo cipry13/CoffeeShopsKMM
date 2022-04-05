@@ -15,23 +15,21 @@ kotlin {
     }
 
     sourceSets {
-        val ktorVersion = "1.5.0"
-        val coroutineVersion = "1.4.2"
+        val coroutinesVersion = "1.5.0-native-mt"
+        val serializationVersion = "1.3.2"
+        val ktorVersion = "1.6.1"
 
         commonMain {
             dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-stdlib-common")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3-native-mt")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
+                implementation("io.ktor:ktor-client-serialization:$ktorVersion")
             }
         }
 
         val androidMain by getting {
             dependencies {
-                implementation("androidx.core:core-ktx:1.7.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutineVersion")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion")
                 implementation("io.ktor:ktor-client-android:$ktorVersion")
             }
         }
