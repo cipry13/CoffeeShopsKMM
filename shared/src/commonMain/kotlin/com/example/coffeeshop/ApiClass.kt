@@ -18,6 +18,7 @@ class ApiClass {
         }
     }
 
+    @Throws(Exception::class)
     suspend fun getData(): List<CoffeeShop> {
         val token = postToken().token
 

@@ -5,6 +5,8 @@ import shared
     let api: ApiClass
     
     @Published var coffeeShopList: [CoffeeShop] = []
+    @Published var isApiError: Bool = false
+    @Published var errorMessage: String = ""
     
     init(api: ApiClass) {
         self.api = api
@@ -14,7 +16,8 @@ import shared
         do {
             self.coffeeShopList = try await api.getData()
         } catch {
-            print(error)
+            isApiError = true
+            errorMessage = error.localizedDescription
         }
     }
 }
@@ -33,6 +36,6 @@ struct ContentView: View {
             Task {
                 await self.viewModel.loadCoffeeShops()
             }
-        }
+        }.alert(Text(viewModel.errorMessage), isPresented: $viewModel.isApiError, actions: {})
     }
 }
